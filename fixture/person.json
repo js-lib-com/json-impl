@@ -1,0 +1,9 @@
+{
+	person: {
+		name: "John Doe",
+		picture: "picture.png"
+	},
+	children: [ "Adam",	{ name: "Eva", genre: "female" }],
+	age: 120,
+	id: 0x10
+}
