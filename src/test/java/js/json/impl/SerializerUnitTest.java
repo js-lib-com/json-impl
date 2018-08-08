@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import js.lang.OrdinalEnum;
 import junit.framework.TestCase;
 
 @SuppressWarnings("unused")
@@ -33,6 +34,16 @@ public class SerializerUnitTest extends TestCase
   public void testNumber() throws Throwable
   {
     assertEquals("123.45", exercise(123.45));
+  }
+
+  public void testEnum() throws Throwable
+  {
+    assertEquals("\"ALIVE\"", exercise(State.ALIVE));
+  }
+
+  public void testOrdinalEnum() throws Throwable
+  {
+    assertEquals("1", exercise(OrdinalState.ALIVE));
   }
 
   public void testDate() throws Throwable
@@ -129,6 +140,9 @@ public class SerializerUnitTest extends TestCase
     return writer.toString();
   }
 
+  // ----------------------------------------------------------------------------------------------
+  // FIXTURE
+
   private static class Person
   {
     static String species = "homo sapiens";
@@ -176,6 +190,11 @@ public class SerializerUnitTest extends TestCase
   }
 
   private static enum State
+  {
+    NONE, ALIVE, DEAD
+  }
+
+  private static enum OrdinalState implements OrdinalEnum
   {
     NONE, ALIVE, DEAD
   }

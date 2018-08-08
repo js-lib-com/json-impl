@@ -9,8 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
 import js.lang.GAType;
 import js.lang.GType;
+import js.lang.OrdinalEnum;
 import js.util.Strings;
 import junit.framework.TestCase;
 
@@ -467,6 +470,21 @@ public class ParserUnitTest extends TestCase
     assertEquals(Cats.LIGER, cats);
   }
 
+  @Test
+  public void ordinalEnum() throws Throwable
+  {
+    String json = "0";
+    OrdinalCats cats = exercise(json, OrdinalCats.class);
+    assertNotNull(cats);
+    assertEquals(OrdinalCats.LIGER, cats);
+  }
+
+  @Test(expected = ArrayIndexOutOfBoundsException.class)
+  public void ordinalEnumIndexOutOfBound() throws Throwable
+  {
+    exercise("3", OrdinalCats.class);
+  }
+
   public void testEnumArray() throws Throwable
   {
     String json = "[\"LIGER\",\"TIGON\"]";
@@ -491,6 +509,15 @@ public class ParserUnitTest extends TestCase
     assertNotNull(cats);
     assertEquals(Cats.LIGER, cats[0]);
     assertEquals(Cats.TIGON, cats[1]);
+  }
+
+  public void testOrdinalEnumArray() throws Throwable
+  {
+    String json = "[0,1]";
+    OrdinalCats[] cats = exercise(json, OrdinalCats[].class);
+    assertNotNull(cats);
+    assertEquals(OrdinalCats.LIGER, cats[0]);
+    assertEquals(OrdinalCats.TIGON, cats[1]);
   }
 
   public void testPropertyNameWithDash() throws Throwable
@@ -595,6 +622,11 @@ public class ParserUnitTest extends TestCase
   }
 
   private static enum Cats
+  {
+    LIGER, TIGON
+  }
+
+  private static enum OrdinalCats implements OrdinalEnum
   {
     LIGER, TIGON
   }
