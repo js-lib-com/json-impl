@@ -110,8 +110,13 @@ class ObjectValue extends Value {
 	 * @return field type or null.
 	 */
 	public Type getValueType() {
-		Field field = Classes.getOptionalField(clazz, fieldName);
-		return field != null ? field.getGenericType() : null;
+	    try {
+	        Field field = Classes.getFieldEx(clazz, fieldName);
+	        return field.getGenericType();
+	    }
+	    catch(NoSuchFieldException e) {
+	      return null;
+	    }
 	}
 
 	/**
