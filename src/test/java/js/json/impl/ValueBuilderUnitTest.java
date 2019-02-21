@@ -1,12 +1,13 @@
 package js.json.impl;
 
+import js.json.impl.LexerValueBuilder;
 import junit.framework.TestCase;
 
 public class ValueBuilderUnitTest extends TestCase
 {
   public void testConformance() throws Throwable
   {
-    assertEquals("\"John Doe\"", exercise("\"John Doe\""));
+    assertEquals("\"John Doe\"", exercise("\\\"John Doe\\\""));
     assertEquals("123.45", exercise("123.45"));
     assertEquals("-123.45", exercise("-123.45"));
     assertEquals("123.45e2", exercise("123.45e2"));
@@ -20,7 +21,7 @@ public class ValueBuilderUnitTest extends TestCase
   public void testNull() throws Throwable
   {
     assertNull(exercise("null"));
-    assertEquals("\"null\"", exercise("\"null\""));
+    assertEquals("\"null\"", exercise("\\\"null\\\""));
   }
 
   public void testEscapeCharacters() throws Throwable
@@ -42,7 +43,7 @@ public class ValueBuilderUnitTest extends TestCase
 
   public void testComplexValue() throws Throwable
   {
-    assertEquals("123.45E2\"/\b\f\n\r\t©\"John Doe\",true,false", exercise("123.45E2\\\"\\/\\b\\f\\n\\r\\t\\u00A9\"John Doe\",true,false"));
+    assertEquals("123.45E2\"/\b\f\n\r\t©\"John Doe\",true,false", exercise("123.45E2\\\"\\/\\b\\f\\n\\r\\t\\u00A9\\\"John Doe\\\",true,false"));
   }
 
   private static String exercise(String value) throws Throwable

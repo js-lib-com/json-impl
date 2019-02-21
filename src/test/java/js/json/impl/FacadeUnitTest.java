@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import js.json.Json;
+import js.json.impl.JsonImpl;
 import js.lang.GType;
 import junit.framework.TestCase;
 

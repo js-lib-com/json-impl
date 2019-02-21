@@ -6,6 +6,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import js.json.impl.Lexer;
+import js.json.impl.Token;
 import js.util.Strings;
 import junit.framework.TestCase;
 

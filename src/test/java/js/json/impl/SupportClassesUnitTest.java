@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import js.json.impl.ErrorReporter;
 import js.util.Classes;
 import junit.framework.TestCase;
 

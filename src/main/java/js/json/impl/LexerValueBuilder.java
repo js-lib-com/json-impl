@@ -21,9 +21,12 @@ final class LexerValueBuilder {
 	 * 
 	 * @param c character to add.
 	 */
-	void append(char c) {
+	boolean append(char c) {
 		switch (state) {
 		case CHAR:
+		    if( c == '"') {
+		      return false;
+		    }
 			if (c == '\\') {
 				state = State.ESCAPE;
 				break;
@@ -36,7 +39,7 @@ final class LexerValueBuilder {
 			case 'u':
 				state = State.UNICODE;
 				unicode.setLength(0);
-				return;
+				return true;
 
 			case '"':
 				builder.append('"');
@@ -87,6 +90,7 @@ final class LexerValueBuilder {
 		default:
 			throw new IllegalStateException();
 		}
+		return true;
 	}
 
 	public void clear() {

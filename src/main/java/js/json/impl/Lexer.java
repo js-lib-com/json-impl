@@ -166,15 +166,11 @@ final class Lexer {
 		c = reader.require(c);
 
 		if (c == '"') {
-			// collect till next quotation mark but takes care of escaped quotes
-			char previousChar = c;
+		    // collect till value builder signals end of string by returning false
 			for (;;) {
-				c = reader.require();
-				if (previousChar != '\\' && c == '"') {
-					break;
+				if(!builder.append(reader.require())) {
+				  break;
 				}
-				builder.append(c);
-				previousChar = c;
 			}
 			reader.skipWhiteSpaces();
 			return builder.toString();

@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.Ignore;
 
+import js.json.impl.Parser;
 import js.lang.GType;
 import junit.framework.TestCase;
 

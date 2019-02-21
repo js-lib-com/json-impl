@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import js.json.impl.Serializer;
 import js.lang.OrdinalEnum;
 import junit.framework.TestCase;
 

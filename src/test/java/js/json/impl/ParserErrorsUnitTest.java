@@ -4,6 +4,9 @@ import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import js.json.impl.ErrorReporter;
+import js.json.impl.JsonParserException;
+import js.json.impl.Parser;
 import js.lang.GType;
 import junit.framework.TestCase;
 

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
 
+import js.json.impl.Parser;
 import junit.framework.TestCase;
 
 public class RegressionsTest extends TestCase

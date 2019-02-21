@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import js.json.impl.Parser;
 import js.lang.GAType;
 import js.lang.GType;
 import js.lang.OrdinalEnum;
@@ -27,6 +28,13 @@ public class ParserUnitTest extends TestCase
     assertNull(exercise("null", Boolean.class));
   }
 
+  public void testStringEscape() throws Throwable {
+//    assertEquals("123\\", exercise("123\\\\", String.class));
+//    assertEquals("czŕSĄ˝eˇśĽ_E-¤p^°LőYN}\\", exercise("czŕS\\u000fĄ˝e\\u0010ˇśĽ_E-¤p\\u0001^°L\\u0016őYN}\\\\", String.class));
+    assertEquals(new Person("A\\"), exercise("{\"name\":\"A\\\\\"}", Person.class));
+//    assertEquals(new Person("123\\", 123), exercise("{\"name\":\"123\\\\\",\"age\":123}", Person.class));
+  }
+  
   public void testNumberValue() throws Throwable
   {
     String json = "123.00";
@@ -577,6 +585,11 @@ public class ParserUnitTest extends TestCase
 
     Person()
     {
+    }
+
+    Person(String name)
+    {
+      this.name = name;
     }
 
     Person(String name, int age)
