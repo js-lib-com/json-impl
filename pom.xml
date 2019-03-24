@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.js-lib</groupId>
 	<artifactId>js-json</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>Reference Implementation for j(s)-lib JSON API</name>
@@ -85,7 +85,7 @@
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
-						<phase>verify</phase>
+						<phase>deploy</phase>
 						<goals>
 							<goal>sign</goal>
 						</goals>
@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>com.js-lib</groupId>
 			<artifactId>js-commons</artifactId>
-			<version>1.1.4</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.js-lib</groupId>
