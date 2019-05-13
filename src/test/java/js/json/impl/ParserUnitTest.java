@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import js.json.impl.Parser;
 import js.lang.GAType;
 import js.lang.GType;
 import js.lang.OrdinalEnum;
@@ -28,13 +27,15 @@ public class ParserUnitTest extends TestCase
     assertNull(exercise("null", Boolean.class));
   }
 
-  public void testStringEscape() throws Throwable {
-//    assertEquals("123\\", exercise("123\\\\", String.class));
-//    assertEquals("czŕSĄ˝eˇśĽ_E-¤p^°LőYN}\\", exercise("czŕS\\u000fĄ˝e\\u0010ˇśĽ_E-¤p\\u0001^°L\\u0016őYN}\\\\", String.class));
+  public void testStringEscape() throws Throwable
+  {
+    // assertEquals("123\\", exercise("123\\\\", String.class));
+    // assertEquals("czŕSĄ˝eˇśĽ_E-¤p^°LőYN}\\",
+    // exercise("czŕS\\u000fĄ˝e\\u0010ˇśĽ_E-¤p\\u0001^°L\\u0016őYN}\\\\", String.class));
     assertEquals(new Person("A\\"), exercise("{\"name\":\"A\\\\\"}", Person.class));
-//    assertEquals(new Person("123\\", 123), exercise("{\"name\":\"123\\\\\",\"age\":123}", Person.class));
+    // assertEquals(new Person("123\\", 123), exercise("{\"name\":\"123\\\\\",\"age\":123}", Person.class));
   }
-  
+
   public void testNumberValue() throws Throwable
   {
     String json = "123.00";
@@ -539,6 +540,17 @@ public class ParserUnitTest extends TestCase
     assertEquals("timeout-or-duplicate", Strings.join(response.errorCodes));
   }
 
+  public void testGenericObject() throws Throwable
+  {
+    String json = "{\"code\":\"200\",\"data\":{\"age\":55,\"name\":\"John Doe\"}}";
+    Response<Person> response = exercise(json, new GType(Response.class, Person.class));
+    assertNotNull(response);
+    assertEquals("200", response.code);
+    assertNotNull(response.data);
+    assertEquals(55, response.data.age);
+    assertEquals("John Doe", response.data.name);
+  }
+
   // ----------------------------------------------------
 
   private static <T> T exercise(String json) throws Throwable
@@ -650,5 +662,11 @@ public class ParserUnitTest extends TestCase
     Date challenge_ts;
     String hostname;
     String[] errorCodes;
+  }
+
+  public static class Response<T>
+  {
+    String code;
+    T data;
   }
 }

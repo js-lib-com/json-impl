@@ -407,12 +407,7 @@ final class Parser
     if(Types.isMap(type)) {
       return new MapValue(converter, type);
     }
-
-    // at this point type should denote a not parameterized strict object
-    if(!(type instanceof Class)) {
-      throw new JsonParserException("Illegal state. Generic objects |%s| are not supported.", type);
-    }
-    return new ObjectValue(converter, (Class<?>)type);
+    return new ObjectValue(converter, type);
   }
 
   /**
