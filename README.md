@@ -1,3 +1,3 @@
 # Reference Implementation for j(s)-lib JSON API
 
-JSON parser and serializer for objects with not restricted complexity.
+This project is the reference implementation of JSON API. It provides JSON parser and serializer for objects with not restricted complexity.
