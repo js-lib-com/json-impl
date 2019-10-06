@@ -60,12 +60,6 @@ public class SerializerUnitTest extends TestCase
     assertEquals("{\"name\":\"John Doe\",\"state\":\"ALIVE\"}", exercise(person));
   }
 
-  public void testFlatObjectWithInboundClass() throws Throwable
-  {
-    Person person = new Person("John Doe");
-    assertEquals("{\"class\":\"js.json.impl.unit.SerializerUnitTest$Person\",\"name\":\"John Doe\",\"state\":\"ALIVE\"}", exerciseWithClass(person));
-  }
-
   public void testArrayOfStrings() throws Throwable
   {
     String[] strings = new String[]
@@ -128,14 +122,6 @@ public class SerializerUnitTest extends TestCase
   private static String exercise(Object value) throws Throwable
   {
     Serializer serializer = new Serializer();
-    StringWriter writer = new StringWriter();
-    serializer.serialize(writer, value);
-    return writer.toString();
-  }
-
-  private static String exerciseWithClass(Object value) throws Throwable
-  {
-    Serializer serializer = new Serializer(true);
     StringWriter writer = new StringWriter();
     serializer.serialize(writer, value);
     return writer.toString();

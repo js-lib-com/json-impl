@@ -113,15 +113,6 @@ public class ParserUnitTest extends TestCase
     assertEquals(50, person.age);
   }
 
-  public void testObjectWithInboundClasss() throws Throwable
-  {
-    String json = "{\"class\":\"js.json.impl.unit.ParserUnitTest$Person\",\"name\":\"John Doe\",\"age\":50}";
-    Person person = exercise(json);
-    assertNotNull(person);
-    assertEquals("John Doe", person.name);
-    assertEquals(50, person.age);
-  }
-
   public void testInheritance() throws Throwable
   {
     String json = "{\"parent\":\"Anonymous\",\"name\":\"John Doe\",\"age\":50}";
@@ -136,15 +127,6 @@ public class ParserUnitTest extends TestCase
   {
     String json = "{\"name\":\"Baby.NET\",\"leader\":{\"name\":\"John Doe\"}}";
     Organization organization = exercise(json, Organization.class);
-    assertNotNull(organization);
-    assertEquals("Baby.NET", organization.name);
-    assertEquals("John Doe", organization.leader.name);
-  }
-
-  public void testNestedObjectsWithInboundClass() throws Throwable
-  {
-    String json = "{\"class\":\"js.json.impl.unit.ParserUnitTest$Organization\",\"name\":\"Baby.NET\",\"leader\":{\"name\":\"John Doe\"}}";
-    Organization organization = exercise(json);
     assertNotNull(organization);
     assertEquals("Baby.NET", organization.name);
     assertEquals("John Doe", organization.leader.name);
@@ -553,12 +535,6 @@ public class ParserUnitTest extends TestCase
   }
 
   // ----------------------------------------------------
-
-  private static <T> T exercise(String json) throws Throwable
-  {
-    StringReader reader = new StringReader(json);
-    return new Parser().parse(reader);
-  }
 
   private static <T> T exercise(String json, Class<T> clazz) throws Throwable
   {

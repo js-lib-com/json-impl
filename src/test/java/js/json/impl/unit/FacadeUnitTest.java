@@ -76,17 +76,6 @@ public class FacadeUnitTest extends TestCase
     assertEquals("{\"name\":\"index.htm\",\"state\":\"ACTIVE\"}", writer.toString());
   }
 
-  public void testStringifyObject() throws IOException
-  {
-    Page page = new Page();
-    page.name = "index.htm";
-    page.state = State.ACTIVE;
-    StringWriter writer = new StringWriter();
-    json.stringifyObject(writer, page);
-
-    assertEquals("{\"class\":\"js.json.impl.unit.FacadeUnitTest$Page\",\"name\":\"index.htm\",\"state\":\"ACTIVE\"}", writer.toString());
-  }
-
   public void testParseObjectFromString()
   {
     final String jsonObject = "{\"name\":\"index.htm\",\"state\":\"ACTIVE\"}";

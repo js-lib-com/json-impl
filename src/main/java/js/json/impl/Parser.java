@@ -214,7 +214,7 @@ public final class Parser
             state = State.WAIT_FOR_KEY;
           }
           else {
-            state = State.WAIT_FOR_NAME_OR_CLASS;
+            state = State.WAIT_FOR_NAME;
           }
           continue;
 
@@ -233,25 +233,6 @@ public final class Parser
         default:
           throw new JsonParserException("Invalid start token %s.", token, this.state);
         }
-
-      case WAIT_FOR_NAME_OR_CLASS:
-        if(token.ordinal() == Token.NAME) {
-          if("class".equals(token.value())) {
-            if(value != null) {
-              throw new JsonParserException("Illegal state. User requested type argument on JSON with inbound class.");
-            }
-            token = lexer.read();
-            if(token.ordinal() != Token.COLON) {
-              throw new JsonParserException("Expected COLON but got %s.", token);
-            }
-            token = lexer.read();
-
-            value = getValueInstance(loadClass(token.value()));
-            state = State.WAIT_FOR_COMMA_OR_RIGHT_BRACE;
-            continue;
-          }
-        }
-        // fall through WAIT_FOR_NAME case
 
       case WAIT_FOR_NAME:
         switch(token.ordinal()) {
@@ -411,39 +392,12 @@ public final class Parser
   }
 
   /**
-   * Load named class.
-   * 
-   * @param className qualified class name.
-   * @return class singleton.
-   * @throws JsonParserException if class not found.
-   */
-  @SuppressWarnings("unchecked")
-  private static <T> Class<T> loadClass(String className)
-  {
-    ClassLoader currentThreadClassLoader = Thread.currentThread().getContextClassLoader();
-    try {
-      return (Class<T>)Class.forName(className, true, currentThreadClassLoader);
-    }
-    catch(ClassNotFoundException unused1) {
-      if(!currentThreadClassLoader.equals(Parser.class.getClassLoader())) {
-        try {
-          return (Class<T>)Class.forName(className, true, Parser.class.getClassLoader());
-        }
-        catch(ClassNotFoundException unused2) {
-          throw new JsonParserException("JSON requested class |%s| not found.", className);
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
    * Parser state machine.
    * 
    * @author Iulian Rotaru
    */
   private static enum State
   {
-    NONE, WAIT_FOR_NAME, WAIT_FOR_NAME_OR_CLASS, WAIT_FOR_ITEM, WAIT_FOR_KEY, WAIT_FOR_COLON, WAIT_FOR_VALUE, WAIT_FOR_COMMA_OR_RIGHT_BRACE, WAIT_FOR_COMMA_OR_RIGHT_SQUARE
+    NONE, WAIT_FOR_NAME, WAIT_FOR_ITEM, WAIT_FOR_KEY, WAIT_FOR_COLON, WAIT_FOR_VALUE, WAIT_FOR_COMMA_OR_RIGHT_BRACE, WAIT_FOR_COMMA_OR_RIGHT_SQUARE
   }
 }

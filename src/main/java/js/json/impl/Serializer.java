@@ -15,7 +15,6 @@ import js.lang.BugError;
 import js.lang.OrdinalEnum;
 import js.log.Log;
 import js.log.LogFactory;
-import js.util.Params;
 import js.util.Strings;
 import js.util.Types;
 
@@ -63,9 +62,6 @@ public final class Serializer
   /** External created writer instance initialized by {@link #serialize(Writer, Object)} entry point. */
   private Writer writer;
 
-  /** Include class name before actual serialized value. This is a non standard extension used primarily by library. */
-  private boolean includeClass;
-
   /**
    * Circular dependencies stack keeps track of processed values. Values are pushed just before entering the actual
    * serialization and extracted at final. See {@link #serialize(Object)}.
@@ -75,18 +71,6 @@ public final class Serializer
   /** Create default serializer. */
   public Serializer()
   {
-  }
-
-  /**
-   * Create serializer instance with inband type information.
-   * 
-   * @param includeClass always true to include class name before serialized value.
-   * @throws IllegalArgumentException if <code>includeClass</code> is not true.
-   */
-  public Serializer(boolean includeClass) throws IllegalArgumentException
-  {
-    Params.isTrue(includeClass, "Include class flag should always be true.");
-    this.includeClass = includeClass;
   }
 
   /**
@@ -243,15 +227,6 @@ public final class Serializer
     int index = 0;
 
     Class<?> clazz = value.getClass();
-
-    if(includeClass) {
-      // do not use inbound class for nested class
-      includeClass = false;
-      writeString("class");
-      write(":");
-      writeString(clazz.getName());
-      ++index;
-    }
 
     for(Field field : clazz.getDeclaredFields()) {
       if(field.isSynthetic()) {
