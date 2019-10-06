@@ -1,4 +1,4 @@
-package js.json.impl;
+package js.json.impl.unit;
 
 import java.io.File;
 import java.lang.reflect.Method;

@@ -5,7 +5,7 @@ package js.json.impl;
  * 
  * @author Iulian Rotaru
  */
-final class ErrorReporter {
+public final class ErrorReporter {
 	/** Thread storage for error reporter instances. */
 	private static ThreadLocal<ErrorReporter> tls = new ThreadLocal<ErrorReporter>();
 
@@ -14,7 +14,7 @@ final class ErrorReporter {
 	 * 
 	 * @return thread error reporter instance.
 	 */
-	static synchronized ErrorReporter getInstance() {
+	public static synchronized ErrorReporter getInstance() {
 		ErrorReporter instance = tls.get();
 		if (instance == null) {
 			instance = new ErrorReporter();
@@ -36,7 +36,7 @@ final class ErrorReporter {
 	 * Reset error reporter internal state. Since error reporter instance is global per thread needs to be reseted every time a
 	 * new parsing process starts.
 	 */
-	void reset() {
+	public void reset() {
 		index = 0;
 	}
 
@@ -46,7 +46,7 @@ final class ErrorReporter {
 	 * 
 	 * @param c character from JSON stream.
 	 */
-	void store(char c) {
+	public void store(char c) {
 		buffer[index % BUFFER_SIZE] = c;
 		index++;
 	}
@@ -56,7 +56,7 @@ final class ErrorReporter {
 	 * 
 	 * @return exception character index.
 	 */
-	int charIndex() {
+	public int charIndex() {
 		return index - 1;
 	}
 
@@ -65,7 +65,7 @@ final class ErrorReporter {
 	 * 
 	 * @return stream sample.
 	 */
-	String streamSample() {
+	public String streamSample() {
 		StringBuilder sb = new StringBuilder();
 		if (index <= BUFFER_SIZE) {
 			for (int i = 0; i < index; i++) {

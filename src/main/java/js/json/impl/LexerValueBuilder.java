@@ -6,7 +6,7 @@ package js.json.impl;
  * 
  * @author Iulian Rotaru
  */
-final class LexerValueBuilder {
+public final class LexerValueBuilder {
 	/** Internal string builder. */
 	private StringBuilder builder = new StringBuilder();
 
@@ -21,7 +21,7 @@ final class LexerValueBuilder {
 	 * 
 	 * @param c character to add.
 	 */
-	boolean append(char c) {
+	public boolean append(char c) {
 		switch (state) {
 		case CHAR:
 		    if( c == '"') {

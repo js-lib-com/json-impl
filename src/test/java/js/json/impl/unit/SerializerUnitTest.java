@@ -1,4 +1,4 @@
-package js.json.impl;
+package js.json.impl.unit;
 
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -63,7 +63,7 @@ public class SerializerUnitTest extends TestCase
   public void testFlatObjectWithInboundClass() throws Throwable
   {
     Person person = new Person("John Doe");
-    assertEquals("{\"class\":\"js.json.impl.SerializerUnitTest$Person\",\"name\":\"John Doe\",\"state\":\"ALIVE\"}", exerciseWithClass(person));
+    assertEquals("{\"class\":\"js.json.impl.unit.SerializerUnitTest$Person\",\"name\":\"John Doe\",\"state\":\"ALIVE\"}", exerciseWithClass(person));
   }
 
   public void testArrayOfStrings() throws Throwable

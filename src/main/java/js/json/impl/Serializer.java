@@ -52,7 +52,7 @@ import js.util.Types;
  * 
  * @author Iulian Rotaru
  */
-final class Serializer
+public final class Serializer
 {
   /** Class logger. */
   public static final Log log = LogFactory.getLog(Serializer.class);

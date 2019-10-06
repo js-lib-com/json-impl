@@ -1,4 +1,4 @@
-package js.json.impl;
+package js.json.impl.unit;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;

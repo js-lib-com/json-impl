@@ -1,4 +1,4 @@
-package js.json.impl;
+package js.json.impl.unit;
 
 import java.io.StringReader;
 import java.lang.reflect.Type;

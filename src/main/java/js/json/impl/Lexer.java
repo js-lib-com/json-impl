@@ -14,7 +14,7 @@ import java.util.Stack;
  * 
  * @author Iulian Rotaru
  */
-final class Lexer {
+public final class Lexer {
 	private static final Token TOKEN_EOF = new Token(Token.EOF);
 	private static final Token TOKEN_LEFT_BRACE = new Token(Token.LEFT_BRACE);
 	private static final Token TOKEN_RIGHT_BRACE = new Token(Token.RIGHT_BRACE);
@@ -43,7 +43,7 @@ final class Lexer {
 	 * 
 	 * @param reader input characters stream.
 	 */
-	Lexer(Reader reader) {
+	public Lexer(Reader reader) {
 		this.reader = new CharReader(reader);
 	}
 
@@ -54,7 +54,7 @@ final class Lexer {
 	 * @throws IOException if reading from input characters stream fails.
 	 * @throws JsonParserException if characters stream morphological structure is violated.
 	 */
-	Token read() throws IOException, JsonParserException {
+	public Token read() throws IOException, JsonParserException {
 		if (state == State.EOF) {
 			throw new JsonParserException("Attempt to read tokens after stream end.");
 		}

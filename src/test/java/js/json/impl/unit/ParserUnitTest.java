@@ -1,4 +1,4 @@
-package js.json.impl;
+package js.json.impl.unit;
 
 import java.io.File;
 import java.io.StringReader;
@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import js.json.impl.Parser;
 import js.lang.GAType;
 import js.lang.GType;
 import js.lang.OrdinalEnum;
@@ -114,7 +115,7 @@ public class ParserUnitTest extends TestCase
 
   public void testObjectWithInboundClasss() throws Throwable
   {
-    String json = "{\"class\":\"js.json.impl.ParserUnitTest$Person\",\"name\":\"John Doe\",\"age\":50}";
+    String json = "{\"class\":\"js.json.impl.unit.ParserUnitTest$Person\",\"name\":\"John Doe\",\"age\":50}";
     Person person = exercise(json);
     assertNotNull(person);
     assertEquals("John Doe", person.name);
@@ -142,7 +143,7 @@ public class ParserUnitTest extends TestCase
 
   public void testNestedObjectsWithInboundClass() throws Throwable
   {
-    String json = "{\"class\":\"js.json.impl.ParserUnitTest$Organization\",\"name\":\"Baby.NET\",\"leader\":{\"name\":\"John Doe\"}}";
+    String json = "{\"class\":\"js.json.impl.unit.ParserUnitTest$Organization\",\"name\":\"Baby.NET\",\"leader\":{\"name\":\"John Doe\"}}";
     Organization organization = exercise(json);
     assertNotNull(organization);
     assertEquals("Baby.NET", organization.name);

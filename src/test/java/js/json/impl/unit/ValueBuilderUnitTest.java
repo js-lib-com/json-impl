@@ -1,4 +1,4 @@
-package js.json.impl;
+package js.json.impl.unit;
 
 import js.json.impl.LexerValueBuilder;
 import junit.framework.TestCase;

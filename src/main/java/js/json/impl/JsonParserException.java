@@ -19,7 +19,7 @@ public class JsonParserException extends JsonException {
 	 * @param message exception formatted message,
 	 * @param args optional formatted arguments.
 	 */
-	JsonParserException(String message, Object... args) {
+	public JsonParserException(String message, Object... args) {
 		super(buildMessage(message, args));
 	}
 
@@ -28,7 +28,7 @@ public class JsonParserException extends JsonException {
 	 * 
 	 * @param t root cause throwable.
 	 */
-	JsonParserException(Throwable t) {
+	public JsonParserException(Throwable t) {
 		super(buildMessage(t));
 	}
 

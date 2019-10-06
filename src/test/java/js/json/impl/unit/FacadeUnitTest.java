@@ -1,4 +1,4 @@
-package js.json.impl;
+package js.json.impl.unit;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -84,7 +84,7 @@ public class FacadeUnitTest extends TestCase
     StringWriter writer = new StringWriter();
     json.stringifyObject(writer, page);
 
-    assertEquals("{\"class\":\"js.json.impl.FacadeUnitTest$Page\",\"name\":\"index.htm\",\"state\":\"ACTIVE\"}", writer.toString());
+    assertEquals("{\"class\":\"js.json.impl.unit.FacadeUnitTest$Page\",\"name\":\"index.htm\",\"state\":\"ACTIVE\"}", writer.toString());
   }
 
   public void testParseObjectFromString()

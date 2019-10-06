@@ -1,4 +1,4 @@
-package js.json.impl;
+package js.json.impl.it;
 
 import java.io.StringReader;
 import java.lang.reflect.Type;
@@ -8,13 +8,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Ignore;
-
 import js.json.impl.Parser;
 import js.lang.GType;
 import junit.framework.TestCase;
 
-@Ignore
 public class ParserStressTest extends TestCase
 {
   private final static int THREADS_COUNT = 10000;

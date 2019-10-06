@@ -51,7 +51,7 @@ import js.util.Types;
  * 
  * @author Iulian Rotaru
  */
-final class Parser
+public final class Parser
 {
   /** Class logger. */
   private static final Log log = LogFactory.getLog(Parser.class);

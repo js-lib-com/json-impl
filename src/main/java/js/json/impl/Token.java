@@ -10,18 +10,18 @@ import java.util.Map;
  * 
  * @author Iulian Rotaru
  */
-final class Token {
-	static final int NONE = 0;
-	static final int LEFT_BRACE = 1;
-	static final int RIGHT_BRACE = 2;
-	static final int LEFT_SQUARE = 3;
-	static final int RIGHT_SQUARE = 4;
-	static final int NAME = 5;
-	static final int VALUE = 6;
-	static final int COLON = 7;
-	static final int ITEM = 8;
-	static final int COMMA = 9;
-	static final int EOF = 10;
+public final class Token {
+	public static final int NONE = 0;
+	public static final int LEFT_BRACE = 1;
+	public static final int RIGHT_BRACE = 2;
+	public static final int LEFT_SQUARE = 3;
+	public static final int RIGHT_SQUARE = 4;
+	public static final int NAME = 5;
+	public static final int VALUE = 6;
+	public static final int COLON = 7;
+	public static final int ITEM = 8;
+	public static final int COMMA = 9;
+	public static final int EOF = 10;
 
 	/** Token enumeration ordinal value. */
 	private final int ordinal;

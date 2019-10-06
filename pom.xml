@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.js-lib</groupId>
 	<artifactId>js-json</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<packaging>jar</packaging>
 
 	<name>Reference Implementation for j(s)-lib JSON API</name>
@@ -46,6 +46,9 @@
 				<version>2.12</version>
 				<configuration>
 					<argLine>-ea -Dfile.encoding=UTF-8</argLine>
+					<includes>
+						<include>**/unit/*</include>
+					</includes>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -131,7 +134,7 @@
 		<dependency>
 			<groupId>com.js-lib</groupId>
 			<artifactId>js-json-api</artifactId>
-			<version>1.0</version>
+			<version>1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
