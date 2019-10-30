@@ -14,15 +14,15 @@ import js.converter.Converter;
  * 
  * @author Iulian Rotaru
  */
-final class ArrayValue extends Value {
+public final class ArrayValue implements Value {
 	/** String converter to/from object. */
-	private Converter converter;
+	private final Converter converter;
 
 	/** Values parsed from JSON array. */
-	private List<Object> values;
+	private final List<Object> values;
 
 	/** Array type can be array class or generic array type. */
-	private Type type;
+	private final Type type;
 
 	/** Array instance. */
 	private Object instance;
@@ -32,7 +32,7 @@ final class ArrayValue extends Value {
 	 * 
 	 * @param type array component type.
 	 */
-	ArrayValue(Converter converter, Type type) {
+	public ArrayValue(Converter converter, Type type) {
 		this.converter = converter;
 		this.values = new ArrayList<Object>();
 		this.type = type;

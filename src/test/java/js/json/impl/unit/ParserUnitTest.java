@@ -1,5 +1,11 @@
 package js.json.impl.unit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.Type;
@@ -11,16 +17,17 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import js.json.impl.JsonParserException;
 import js.json.impl.Parser;
 import js.lang.GAType;
 import js.lang.GType;
 import js.lang.OrdinalEnum;
 import js.util.Strings;
-import junit.framework.TestCase;
 
-public class ParserUnitTest extends TestCase
+public class ParserUnitTest
 {
-  public void testStringValue() throws Throwable
+  @Test
+  public void stringValue() throws Throwable
   {
     String json = "\"John Doe\"";
     String instance = exercise(json, String.class);
@@ -28,52 +35,54 @@ public class ParserUnitTest extends TestCase
     assertNull(exercise("null", Boolean.class));
   }
 
-  public void testStringEscape() throws Throwable
+  @Test
+  public void stringEscape() throws Throwable
   {
-    // assertEquals("123\\", exercise("123\\\\", String.class));
-    // assertEquals("czŕSĄ˝eˇśĽ_E-¤p^°LőYN}\\",
-    // exercise("czŕS\\u000fĄ˝e\\u0010ˇśĽ_E-¤p\\u0001^°L\\u0016őYN}\\\\", String.class));
+    assertEquals("123\\", exercise("123\\\\", String.class));
     assertEquals(new Person("A\\"), exercise("{\"name\":\"A\\\\\"}", Person.class));
-    // assertEquals(new Person("123\\", 123), exercise("{\"name\":\"123\\\\\",\"age\":123}", Person.class));
+    assertEquals(new Person("123\\", 123), exercise("{\"name\":\"123\\\\\",\"age\":123}", Person.class));
   }
 
-  public void testNumberValue() throws Throwable
+  @Test
+  public void numberValue() throws Throwable
   {
     String json = "123.00";
     assertEquals((byte)123, (byte)exercise(json, byte.class));
     assertEquals((short)123, (short)exercise(json, short.class));
     assertEquals((int)123, (int)exercise(json, int.class));
     assertEquals((long)123, (long)exercise(json, long.class));
-    assertEquals((float)123, (float)exercise(json, float.class));
-    assertEquals((double)123, (double)exercise(json, double.class));
+    assertEquals((float)123, (float)exercise(json, float.class), 0);
+    assertEquals((double)123, (double)exercise(json, double.class), 0);
     assertEquals((byte)123, (byte)exercise(json, Byte.class));
     assertEquals((short)123, (short)exercise(json, Short.class));
     assertEquals((int)123, (int)exercise(json, Integer.class));
     assertEquals((long)123, (long)exercise(json, Long.class));
-    assertEquals((float)123, (float)exercise(json, Float.class));
-    assertEquals((double)123, (double)exercise(json, Double.class));
+    assertEquals((float)123, (float)exercise(json, Float.class), 0);
+    assertEquals((double)123, (double)exercise(json, Double.class), 0);
     assertNull(exercise("null", Boolean.class));
   }
 
-  public void testHexadecimalNumberValue() throws Throwable
+  @Test
+  public void hexadecimalNumberValue() throws Throwable
   {
     String json = "0x7B";
     assertEquals((byte)123, (byte)exercise(json, byte.class));
     assertEquals((short)123, (short)exercise(json, short.class));
     assertEquals((int)123, (int)exercise(json, int.class));
     assertEquals((long)123, (long)exercise(json, long.class));
-    assertEquals((float)123, (float)exercise(json, float.class));
-    assertEquals((double)123, (double)exercise(json, double.class));
+    assertEquals((float)123, (float)exercise(json, float.class), 0);
+    assertEquals((double)123, (double)exercise(json, double.class), 0);
     assertEquals((byte)123, (byte)exercise(json, Byte.class));
     assertEquals((short)123, (short)exercise(json, Short.class));
     assertEquals((int)123, (int)exercise(json, Integer.class));
     assertEquals((long)123, (long)exercise(json, Long.class));
-    assertEquals((float)123, (float)exercise(json, Float.class));
-    assertEquals((double)123, (double)exercise(json, Double.class));
+    assertEquals((float)123, (float)exercise(json, Float.class), 0);
+    assertEquals((double)123, (double)exercise(json, Double.class), 0);
     assertNull(exercise("null", Boolean.class));
   }
 
-  public void testBooleanValue() throws Throwable
+  @Test
+  public void booleanValue() throws Throwable
   {
     assertTrue(exercise("true", boolean.class));
     assertFalse(exercise("false", boolean.class));
@@ -91,20 +100,33 @@ public class ParserUnitTest extends TestCase
     assertNull(exercise("null", Boolean.class));
   }
 
-  public void testFilePrimitive() throws Throwable
+  @Test
+  public void filePrimitive() throws Throwable
   {
     String json = "\"/home/user/file.txt\"";
     File file = exercise(json, File.class);
     assertEquals("file.txt", file.getName());
   }
 
-  public void testNullValue() throws Throwable
+  @Test
+  public void nullValue() throws Throwable
   {
     String json = "null";
     assertNull(exercise(json, Person.class));
   }
 
-  public void testFlatObject() throws Throwable
+  @Test
+  public void complexGraph() throws Throwable
+  {
+    String json = "{\"name\":\"Baby.NET\\u00A9\\\"2013\",\"leader\":{\"name\":\"Mr. Leader\"},\"departments\":[{\"name\":\"Waste Disposal\",\"employees\":[{\"name\":\"WALLE\"},{\"name\":\"EVA\"}]},{\"name\":\"Manager\",\"employees\":[{\"name\":\"John Doe\"}]}]}";
+    Organization organization = exercise(json, Organization.class);
+    assertNotNull(organization);
+    assertEquals("Baby.NET©\"2013", organization.name);
+    assertEquals("Mr. Leader", organization.leader.name);
+  }
+
+  @Test
+  public void object_Flat() throws Throwable
   {
     String json = "{\"name\":\"John Doe\",\"age\":50}";
     Person person = exercise(json, Person.class);
@@ -113,7 +135,8 @@ public class ParserUnitTest extends TestCase
     assertEquals(50, person.age);
   }
 
-  public void testInheritance() throws Throwable
+  @Test
+  public void object_Inheritance() throws Throwable
   {
     String json = "{\"parent\":\"Anonymous\",\"name\":\"John Doe\",\"age\":50}";
     Child child = exercise(json, Child.class);
@@ -123,7 +146,8 @@ public class ParserUnitTest extends TestCase
     assertEquals(50, child.age);
   }
 
-  public void testNestedObjects() throws Throwable
+  @Test
+  public void object_Nesteds() throws Throwable
   {
     String json = "{\"name\":\"Baby.NET\",\"leader\":{\"name\":\"John Doe\"}}";
     Organization organization = exercise(json, Organization.class);
@@ -132,7 +156,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("John Doe", organization.leader.name);
   }
 
-  public void testEmptyObject() throws Throwable
+  @Test
+  public void object_Empty() throws Throwable
   {
     String json = "{\"name\":\"Baby.NET\",\"leader\":{}}";
     Organization organization = exercise(json, Organization.class);
@@ -141,7 +166,18 @@ public class ParserUnitTest extends TestCase
     assertNotNull(organization.leader);
   }
 
-  public void testArrayOfStrings() throws Throwable
+  @Test
+  public void object_WithNewLineBeforeEndBracet() throws Throwable
+  {
+    String json = "{aliases:[\"alias\"]\r\n}";
+    User user = exercise(json, User.class);
+    assertNotNull(user);
+    assertEquals(1, user.aliases.length);
+    assertEquals("alias", user.aliases[0]);
+  }
+
+  @Test
+  public void array_Strings() throws Throwable
   {
     String json = "[\"John Doe\",\"picture.png\"]";
     String[] strings = exercise(json, String[].class);
@@ -151,7 +187,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("picture.png", strings[1]);
   }
 
-  public void testArrayOfIntegers() throws Throwable
+  @Test
+  public void array_Integers() throws Throwable
   {
     String json = "[1234,5678]";
 
@@ -168,7 +205,8 @@ public class ParserUnitTest extends TestCase
     assertEquals(5678, ints[1]);
   }
 
-  public void testArrayOfBooleans() throws Throwable
+  @Test
+  public void array_Booleans() throws Throwable
   {
     String json = "[false,true]";
 
@@ -185,7 +223,8 @@ public class ParserUnitTest extends TestCase
     assertTrue(bools[1]);
   }
 
-  public void testArrayOfPersons() throws Throwable
+  @Test
+  public void array_Persons() throws Throwable
   {
     String json = "[{\"name\":\"WALLE\"},{\"name\":\"EVA\"}]";
     Person[] persons = exercise(json, Person[].class);
@@ -195,7 +234,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("EVA", persons[1].name);
   }
 
-  public void testArrayOfArrayOfStrings() throws Throwable
+  @Test
+  public void array_ArrayOfStrings() throws Throwable
   {
     String json = "[[\"WALLE\",\"walle.png\"],[\"EVA\",\"eva.png\"]]";
     String[][] persons = exercise(json, String[][].class);
@@ -207,66 +247,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("eva.png", persons[1][1]);
   }
 
-  public void testListOfStrings() throws Throwable
-  {
-    String json = "[\"John Doe\",null,\"picture.png\"]";
-    List<String> strings = exercise(json, new GType(List.class, String.class));
-    assertNotNull(strings);
-    assertTrue(strings instanceof ArrayList);
-    assertEquals(3, strings.size());
-    assertEquals("John Doe", strings.get(0));
-    assertNull(strings.get(1));
-    assertEquals("picture.png", strings.get(2));
-  }
-
-  public void testListOfIntegers() throws Throwable
-  {
-    String json = "[1234,5678]";
-    List<Integer> integers = exercise(json, new GType(List.class, Integer.class));
-    assertNotNull(integers);
-    assertTrue(integers instanceof ArrayList);
-    assertEquals(2, integers.size());
-    assertEquals(1234, integers.get(0).intValue());
-    assertEquals(5678, integers.get(1).intValue());
-  }
-
-  public void testListOfEnums() throws Throwable
-  {
-    String json = "[\"LIGER\",\"TIGON\"]";
-    List<Integer> cats = exercise(json, new GType(List.class, Cats.class));
-    assertNotNull(cats);
-    assertTrue(cats instanceof ArrayList);
-    assertEquals(2, cats.size());
-    assertEquals(Cats.LIGER, cats.get(0));
-    assertEquals(Cats.TIGON, cats.get(1));
-  }
-
-  public void testListOfBooleans() throws Throwable
-  {
-    String json = "[false,true]";
-    List<Boolean> booleans = exercise(json, new GType(List.class, Boolean.class));
-    assertNotNull(booleans);
-    assertTrue(booleans instanceof ArrayList);
-    assertEquals(2, booleans.size());
-    assertFalse(booleans.get(0));
-    assertTrue(booleans.get(1));
-  }
-
-  public void testListOfLists() throws Throwable
-  {
-    String json = "[[{\"name\":\"John Doe\",\"age\":50}],[{\"name\":\"Jane Doe\",\"age\":40}]]";
-    List<List<Person>> persons = exercise(json, new GType(List.class, new GType(List.class, Person.class)));
-    assertNotNull(persons);
-    assertEquals(2, persons.size());
-    assertEquals(1, persons.get(0).size());
-    assertEquals(1, persons.get(1).size());
-    assertEquals("John Doe", persons.get(0).get(0).name);
-    assertEquals(50, persons.get(0).get(0).age);
-    assertEquals("Jane Doe", persons.get(1).get(0).name);
-    assertEquals(40, persons.get(1).get(0).age);
-  }
-
-  public void testArrayOfLists() throws Throwable
+  @Test
+  public void array_Lists() throws Throwable
   {
     // although Java forbids generic array instantiation parser allows it
     // List<String>[] a1 = new List[10]; // allowed
@@ -284,7 +266,96 @@ public class ParserUnitTest extends TestCase
     assertEquals(40, persons[1].get(0).age);
   }
 
-  public void testEmptyList() throws Throwable
+  @Test
+  public void list_Strings() throws Throwable
+  {
+    String json = "[\"John Doe\",null,\"picture.png\"]";
+    List<String> strings = exercise(json, new GType(List.class, String.class));
+    assertNotNull(strings);
+    assertTrue(strings instanceof ArrayList);
+    assertEquals(3, strings.size());
+    assertEquals("John Doe", strings.get(0));
+    assertNull(strings.get(1));
+    assertEquals("picture.png", strings.get(2));
+  }
+
+  @Test
+  public void list_Integers() throws Throwable
+  {
+    String json = "[1234,5678]";
+    List<Integer> integers = exercise(json, new GType(List.class, Integer.class));
+    assertNotNull(integers);
+    assertTrue(integers instanceof ArrayList);
+    assertEquals(2, integers.size());
+    assertEquals(1234, integers.get(0).intValue());
+    assertEquals(5678, integers.get(1).intValue());
+  }
+
+  @Test
+  public void list_Enums() throws Throwable
+  {
+    String json = "[\"LIGER\",\"TIGON\"]";
+    List<Integer> cats = exercise(json, new GType(List.class, Cats.class));
+    assertNotNull(cats);
+    assertTrue(cats instanceof ArrayList);
+    assertEquals(2, cats.size());
+    assertEquals(Cats.LIGER, cats.get(0));
+    assertEquals(Cats.TIGON, cats.get(1));
+  }
+
+  @Test
+  public void list_Booleans() throws Throwable
+  {
+    String json = "[false,true]";
+    List<Boolean> booleans = exercise(json, new GType(List.class, Boolean.class));
+    assertNotNull(booleans);
+    assertTrue(booleans instanceof ArrayList);
+    assertEquals(2, booleans.size());
+    assertFalse(booleans.get(0));
+    assertTrue(booleans.get(1));
+  }
+
+  @Test
+  public void list_Lists() throws Throwable
+  {
+    String json = "[[{\"name\":\"John Doe\",\"age\":50}],[{\"name\":\"Jane Doe\",\"age\":40}]]";
+    List<List<Person>> persons = exercise(json, new GType(List.class, new GType(List.class, Person.class)));
+    assertNotNull(persons);
+    assertEquals(2, persons.size());
+    assertEquals(1, persons.get(0).size());
+    assertEquals(1, persons.get(1).size());
+    assertEquals("John Doe", persons.get(0).get(0).name);
+    assertEquals(50, persons.get(0).get(0).age);
+    assertEquals("Jane Doe", persons.get(1).get(0).name);
+    assertEquals(40, persons.get(1).get(0).age);
+  }
+
+  @Test
+  public void list_ParameterizedObject() throws Throwable
+  {
+    String json = "[{\"code\":\"INT\",\"data\":1234}]";
+    List<Response<Integer>> responses = exercise(json, new GType(List.class, new GType(Response.class, Integer.class)));
+    assertNotNull(responses);
+    assertEquals(1, responses.size());
+    assertEquals("INT", responses.get(0).code);
+    assertTrue(responses.get(0).data instanceof Integer);
+    assertEquals(1234, (int)responses.get(0).data);
+  }
+
+  @Test
+  public void list_ParameterizedObjectWithParameterizedList() throws Throwable
+  {
+    String json = "[{\"keyword\":\"family\",\"objectKeys\":[1]}]";
+    List<KeywordIndex<Integer>> indices = exercise(json, new GType(List.class, new GType(KeywordIndex.class, Integer.class)));
+    assertNotNull(indices);
+    assertEquals(1, indices.size());
+    assertEquals("family", indices.get(0).keyword);
+    assertTrue(indices.get(0).objectKeys.get(0) instanceof Integer);
+    assertEquals(1, (int)indices.get(0).objectKeys.get(0));
+  }
+
+  @Test
+  public void list_Empty() throws Throwable
   {
     String json = "{\"name\":\"Research\",\"employees\":[]}";
     Department department = exercise(json, Department.class);
@@ -293,7 +364,81 @@ public class ParserUnitTest extends TestCase
     assertEquals(0, department.employees.size());
   }
 
-  public void testMapOfStrings() throws Throwable
+  @Test
+  public void parameterizedObject_Primitive() throws Throwable
+  {
+    String json = "{\"code\":\"INT\",\"data\":1234}";
+    Response<Integer> response = exercise(json, new GType(Response.class, Integer.class));
+    assertNotNull(response);
+    assertEquals("INT", response.code);
+    assertTrue(response.data instanceof Integer);
+    assertEquals(1234, (int)response.data);
+  }
+
+  @Test
+  public void parameterizedObject_Object() throws Throwable
+  {
+    String json = "{\"code\":\"200\",\"data\":{\"age\":55,\"name\":\"John Doe\"}}";
+    Response<Person> response = exercise(json, new GType(Response.class, Person.class));
+    assertNotNull(response);
+    assertEquals("200", response.code);
+    assertNotNull(response.data);
+    assertEquals(55, response.data.age);
+    assertEquals("John Doe", response.data.name);
+  }
+
+  @Test
+  public void parameterizedObject_WithParameterizedList() throws Throwable
+  {
+    String json = "{\"keyword\":\"family\",\"objectKeys\":[1]}";
+    KeywordIndex<Integer> index = exercise(json, new GType(KeywordIndex.class, Integer.class));
+    assertNotNull(index);
+    assertEquals("family", index.keyword);
+    assertTrue(index.objectKeys.get(0) instanceof Integer);
+    assertEquals(1, (int)index.objectKeys.get(0));
+  }
+
+  @Test
+  public void parameterizedObject_WithPartiallyParameterizedMap() throws Throwable
+  {
+    String json = "{\"values\":{\"family\":1}}";
+    Dictionary<Integer> dictionary = exercise(json, new GType(Dictionary.class, Integer.class));
+    assertNotNull(dictionary);
+    assertNotNull(dictionary.values);
+    assertNotNull(dictionary.values.get("family"));
+    assertTrue(dictionary.values.get("family") instanceof Integer);
+    assertEquals(1, (int)dictionary.values.get("family"));
+  }
+
+  @Test
+  public void parameterizedObject_WithParameterizedObject() throws Throwable
+  {
+    String json = "{\"dictionary\":{\"values\":{\"family\":1}}}";
+    Corpus<Integer> corpus = exercise(json, new GType(Corpus.class, Integer.class));
+    assertNotNull(corpus);
+    assertNotNull(corpus.dictionary);
+    assertNotNull(corpus.dictionary.values);
+    assertNotNull(corpus.dictionary.values.get("family"));
+    assertTrue(corpus.dictionary.values.get("family") instanceof Integer);
+    assertEquals(1, (int)corpus.dictionary.values.get("family"));
+  }
+
+  @Test
+  public void parameterizedObject_WithParameterizedObjectWithParameterizedObject() throws Throwable
+  {
+    String json = "{\"corpus\":{\"dictionary\":{\"values\":{\"family\":1}}}}";
+    Library<Integer> library = exercise(json, new GType(Library.class, Integer.class));
+    assertNotNull(library);
+    assertNotNull(library.corpus);
+    assertNotNull(library.corpus.dictionary);
+    assertNotNull(library.corpus.dictionary.values);
+    assertNotNull(library.corpus.dictionary.values.get("family"));
+    assertTrue(library.corpus.dictionary.values.get("family") instanceof Integer);
+    assertEquals(1, (int)library.corpus.dictionary.values.get("family"));
+  }
+
+  @Test
+  public void map_Strings() throws Throwable
   {
     String json = "{\"name\":\"John Doe\",\"picture\":\"picture.png\"}";
     Map<String, String> person = exercise(json, new GType(Map.class, String.class, String.class));
@@ -303,7 +448,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("picture.png", person.get("picture"));
   }
 
-  public void testMapOfStringsWithDash() throws Throwable
+  @Test
+  public void map_StringsWithDash() throws Throwable
   {
     String json = "{\"user-name\":\"John Doe\",\"user-picture\":\"john-picture.png\"}";
     Map<String, String> person = exercise(json, new GType(Map.class, String.class, String.class));
@@ -313,7 +459,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("john-picture.png", person.get("user-picture"));
   }
 
-  public void testMapOfIntegers() throws Throwable
+  @Test
+  public void map_Integers() throws Throwable
   {
     String json = "{\"first\":1234,\"second\":5678}";
     Map<String, Integer> integers = exercise(json, new GType(Map.class, String.class, Integer.class));
@@ -323,7 +470,8 @@ public class ParserUnitTest extends TestCase
     assertEquals(5678, integers.get("second").intValue());
   }
 
-  public void testMapOfBooleans() throws Throwable
+  @Test
+  public void map_Booleans() throws Throwable
   {
     String json = "{\"first\":false,\"second\":true}";
     Map<String, Boolean> booleans = exercise(json, new GType(Map.class, String.class, Boolean.class));
@@ -333,7 +481,8 @@ public class ParserUnitTest extends TestCase
     assertTrue(booleans.get("second"));
   }
 
-  public void testMapOfPersons() throws Throwable
+  @Test
+  public void map_Persons() throws Throwable
   {
     String json = "{\"worker\":{\"name\":\"WALLE\"},\"specialist\":{\"name\":\"EVA\"}}";
     Map<String, Person> map = exercise(json, new GType(Map.class, String.class, Person.class));
@@ -343,7 +492,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("EVA", map.get("specialist").name);
   }
 
-  public void testMapObjectKey() throws Throwable
+  @Test
+  public void map_ObjectKey() throws Throwable
   {
     String json = "{{\"name\":\"WALLE\",\"age\":1964}:\"worker\",{\"name\":\"EVA\"}:\"specialist\",null:\"expert\"}";
     Map<Person, String> map = exercise(json, new GType(Map.class, Person.class, String.class));
@@ -354,7 +504,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("expert", map.get(null));
   }
 
-  public void testEmptyMap() throws Throwable
+  @Test
+  public void map_Empty() throws Throwable
   {
     String json = "{}";
     Map<String, Person> map = exercise(json, new GType(Map.class, String.class, Person.class));
@@ -363,7 +514,8 @@ public class ParserUnitTest extends TestCase
     assertTrue(map.isEmpty());
   }
 
-  public void testMapOfEmptyObject() throws Throwable
+  @Test
+  public void map_EmptyObject() throws Throwable
   {
     String json = "{\"worker\":{},\"specialist\":{\"name\":\"EVA\"}}";
     Map<String, Person> map = exercise(json, new GType(Map.class, String.class, Person.class));
@@ -373,7 +525,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("EVA", map.get("specialist").name);
   }
 
-  public void testMapEmptyObjectKey() throws Throwable
+  @Test
+  public void map_EmptyObjectKey() throws Throwable
   {
     String json = "{{}:\"worker\"}";
     Map<Person, String> map = exercise(json, new GType(Map.class, Person.class, String.class));
@@ -382,7 +535,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("worker", map.get(new Person(null, 0)));
   }
 
-  public void testMapIntegerKey() throws Throwable
+  @Test
+  public void map_IntegerKey() throws Throwable
   {
     String json = "{1964:\"worker\",0:\"specialist\"}";
     Map<Integer, String> map = exercise(json, new GType(Map.class, Integer.class, String.class));
@@ -392,7 +546,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("specialist", map.get(0));
   }
 
-  public void testMapDoubleKey() throws Throwable
+  @Test
+  public void map_DoubleKey() throws Throwable
   {
     String json = "{1.5:\"worker\",2.0:\"specialist\"}";
     Map<Double, String> map = exercise(json, new GType(Map.class, Double.class, String.class));
@@ -402,17 +557,9 @@ public class ParserUnitTest extends TestCase
     assertEquals("specialist", map.get(2.0));
   }
 
-  public void testComplexGraph() throws Throwable
-  {
-    String json = "{\"name\":\"Baby.NET\\u00A9\\\"2013\",\"leader\":{\"name\":\"Mr. Leader\"},\"departments\":[{\"name\":\"Waste Disposal\",\"employees\":[{\"name\":\"WALLE\"},{\"name\":\"EVA\"}]},{\"name\":\"Manager\",\"employees\":[{\"name\":\"John Doe\"}]}]}";
-    Organization organization = exercise(json, Organization.class);
-    assertNotNull(organization);
-    assertEquals("Baby.NET©\"2013", organization.name);
-    assertEquals("Mr. Leader", organization.leader.name);
-  }
-
   @SuppressWarnings("unchecked")
-  public void testArgumentsList() throws Throwable
+  @Test
+  public void argumentsList() throws Throwable
   {
     String json = "[\"string\",{\"name\":\"John Doe\"},[\"item1\",\"item2\"]]";
     Type[] formalTypes = new Type[]
@@ -429,7 +576,8 @@ public class ParserUnitTest extends TestCase
   }
 
   @SuppressWarnings("unchecked")
-  public void testArgumentsListWithoutQuotes() throws Throwable
+  @Test
+  public void argumentsList_WithoutQuotes() throws Throwable
   {
     String json = "[string,{name:\"John Doe\"},[item1,item2]]";
     Type[] formalTypes = new Type[]
@@ -445,16 +593,8 @@ public class ParserUnitTest extends TestCase
     assertEquals("item2", ((List<String>)arguments[2]).get(1));
   }
 
-  public void testObjectWithNewLineBeforeEndBracet() throws Throwable
-  {
-    String json = "{aliases:[\"alias\"]\r\n}";
-    User user = exercise(json, User.class);
-    assertNotNull(user);
-    assertEquals(1, user.aliases.length);
-    assertEquals("alias", user.aliases[0]);
-  }
-
-  public void testEnum() throws Throwable
+  @Test
+  public void enumeration() throws Throwable
   {
     String json = "\"LIGER\"";
     Cats cats = exercise(json, Cats.class);
@@ -463,7 +603,7 @@ public class ParserUnitTest extends TestCase
   }
 
   @Test
-  public void ordinalEnum() throws Throwable
+  public void enumeration_Ordinal() throws Throwable
   {
     String json = "0";
     OrdinalCats cats = exercise(json, OrdinalCats.class);
@@ -471,13 +611,14 @@ public class ParserUnitTest extends TestCase
     assertEquals(OrdinalCats.LIGER, cats);
   }
 
-  @Test(expected = ArrayIndexOutOfBoundsException.class)
-  public void ordinalEnumIndexOutOfBound() throws Throwable
+  @Test(expected = JsonParserException.class)
+  public void enumeration_IndexOutOfBound() throws Throwable
   {
     exercise("3", OrdinalCats.class);
   }
 
-  public void testEnumArray() throws Throwable
+  @Test
+  public void enumeration_Array() throws Throwable
   {
     String json = "[\"LIGER\",\"TIGON\"]";
     Cats[] cats = exercise(json, Cats[].class);
@@ -486,7 +627,8 @@ public class ParserUnitTest extends TestCase
     assertEquals(Cats.TIGON, cats[1]);
   }
 
-  public void testEnumWithoutQuotes() throws Throwable
+  @Test
+  public void enumeration_WithoutQuotes() throws Throwable
   {
     String json = "LIGER";
     Cats cats = exercise(json, Cats.class);
@@ -494,7 +636,8 @@ public class ParserUnitTest extends TestCase
     assertEquals(Cats.LIGER, cats);
   }
 
-  public void testEnumArrayWithoutQuotes() throws Throwable
+  @Test
+  public void enumeration_ArrayWithoutQuotes() throws Throwable
   {
     String json = "[LIGER,TIGON]";
     Cats[] cats = exercise(json, Cats[].class);
@@ -503,7 +646,8 @@ public class ParserUnitTest extends TestCase
     assertEquals(Cats.TIGON, cats[1]);
   }
 
-  public void testOrdinalEnumArray() throws Throwable
+  @Test
+  public void enumeration_OrdinalArray() throws Throwable
   {
     String json = "[0,1]";
     OrdinalCats[] cats = exercise(json, OrdinalCats[].class);
@@ -512,7 +656,8 @@ public class ParserUnitTest extends TestCase
     assertEquals(OrdinalCats.TIGON, cats[1]);
   }
 
-  public void testPropertyNameWithDash() throws Throwable
+  @Test
+  public void propertyNameWithDash() throws Throwable
   {
     String json = "{\"success\":false,\"challenge_ts\":\"2017-07-22T07:01:29Z\",\"hostname\":\"localhost\",\"error-codes\":[\"timeout-or-duplicate\"]}";
     VerifyResponse response = exercise(json, VerifyResponse.class);
@@ -523,17 +668,12 @@ public class ParserUnitTest extends TestCase
     assertEquals("timeout-or-duplicate", Strings.join(response.errorCodes));
   }
 
-  public void testGenericObject() throws Throwable
-  {
-    String json = "{\"code\":\"200\",\"data\":{\"age\":55,\"name\":\"John Doe\"}}";
-    Response<Person> response = exercise(json, new GType(Response.class, Person.class));
-    assertNotNull(response);
-    assertEquals("200", response.code);
-    assertNotNull(response.data);
-    assertEquals(55, response.data.age);
-    assertEquals("John Doe", response.data.name);
+  @Test
+  public void missingField() throws Throwable {
+    String json = "{\"fake-field-name\":\"John Doe\",\"age\":50}";
+    exercise(json, Person.class);
   }
-
+  
   // ----------------------------------------------------
 
   private static <T> T exercise(String json, Class<T> clazz) throws Throwable
@@ -641,9 +781,30 @@ public class ParserUnitTest extends TestCase
     String[] errorCodes;
   }
 
-  public static class Response<T>
+  private static class Response<T>
   {
     String code;
     T data;
+  }
+
+  private static class KeywordIndex<T>
+  {
+    String keyword;
+    List<T> objectKeys;
+  }
+
+  private static class Dictionary<V>
+  {
+    Map<String, V> values;
+  }
+
+  private static class Corpus<T>
+  {
+    Dictionary<T> dictionary;
+  }
+
+  private static class Library<T>
+  {
+    Corpus<T> corpus;
   }
 }

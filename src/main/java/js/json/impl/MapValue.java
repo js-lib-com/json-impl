@@ -17,10 +17,10 @@ import js.util.Classes;
  */
 final class MapValue extends ObjectValue {
 	/** Map key type initialized from constructor map type, first actual type argument. */
-	private Class<?> keyType;
+	private final Class<?> keyType;
 
 	/** Map value type initialized from constructor map type, second actual type argument. */
-	private Class<?> valueType;
+	private final Class<?> valueType;
 
 	/** Key instance for currently, on working entry. */
 	private Object key;
@@ -36,7 +36,6 @@ final class MapValue extends ObjectValue {
 	 */
 	MapValue(Converter converter, Type type) {
 		super(converter);
-
 		if (!(type instanceof ParameterizedType)) {
 			throw new JsonParserException("This JSON parser mandates generic maps usage but got |%s|.", type);
 		}
@@ -49,9 +48,9 @@ final class MapValue extends ObjectValue {
 			throw new JsonParserException("Invalid map generic arguments list. Need 2 arguments but got |%d|.", actualTypeArguments.length);
 		}
 
-		keyType = (Class<?>) actualTypeArguments[0];
-		valueType = (Class<?>) actualTypeArguments[1];
-		instance = Classes.newMap(rawType);
+		this.keyType = (Class<?>) actualTypeArguments[0];
+		this.valueType = (Class<?>) actualTypeArguments[1];
+		this.instance = Classes.newMap(rawType);
 	}
 
 	/**

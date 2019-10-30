@@ -7,46 +7,25 @@ import java.lang.reflect.TypeVariable;
 
 import js.converter.Converter;
 import js.lang.BugError;
+import js.lang.GType;
 import js.log.Log;
 import js.log.LogFactory;
 import js.util.Classes;
 import js.util.Strings;
 
 /**
- * Non generic object value. This class helps parser to create object instance of proper type and set fields values.
- * <p>
- * This class does not support generic classes because type variables are removed from byte code. In example below
- * <code>T</code> field will be of type <code>java.lang.Object</code>. Note that parameterized types are stored into
- * byte code and <code>integers</code> field can be properly reflected. Anyway, since type variables are not accessible
- * we cannot use generic objects.
- * 
- * <pre>
- * private static class Box&lt;T&gt;
- * {
- *   T value;
- *   List&lt;Integer&gt; integers;
- * }
- * </pre>
- * <p>
- * Note1: do not confuse type variables (a.k.a. type parameters) with parameterized types. Remember that a parameterized
- * type is obtained by referencing a generic class with a concrete type argument; in example would be
- * <code>Box&lt;Integer&gt;</code>.To sum up, type variables are not stored into byte code whereas parameterized types
- * are.
- * <p>
- * Note2: in case you wonder why collections and maps are supported and generic objects not. Simple. For collections we
- * have a single type variable and we know it is component type. On maps we know first type variables is the key and the
- * second is value. For generic object fields I do not know a way to find out the bound between a field and class type
- * variables.
+ * Generic object value handler. This class helps parser to create object instance of proper type and set its fields
+ * values.
  * 
  * @author Iulian Rotaru
  */
-class ObjectValue extends Value
+public class ObjectValue implements Value
 {
   /** Class logger. */
   private static final Log log = LogFactory.getLog(ObjectValue.class);
 
   /** Value converter to and from strings. */
-  protected Converter converter;
+  protected final Converter converter;
 
   /** Object declaring type. */
   private Type declaringType;
@@ -73,18 +52,11 @@ class ObjectValue extends Value
    * 
    * @param clazz object class.
    */
-  ObjectValue(Converter converter, Type type)
+  public ObjectValue(Converter converter, Type type)
   {
     this(converter);
     this.declaringType = type;
-
-    if(type instanceof ParameterizedType) {
-      this.declaringClass = (Class<?>)((ParameterizedType)type).getRawType();
-    }
-    else {
-      this.declaringClass = (Class<?>)type;
-    }
-
+    this.declaringClass = Classes.forType(type);
     this.instance = Classes.newInstance(this.declaringClass);
   }
 
@@ -120,13 +92,46 @@ class ObjectValue extends Value
   public void set(Object value) throws UnsupportedOperationException
   {
     if(value != null) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException(String.format("Object value setter is not supported. Possible for JSON stream not consistent with type |%s|.", declaringType));
     }
     instance = null;
   }
 
   /**
-   * Get the type of named field or null if field does not exist.
+   * Get the type of named field or null if field does not exist. This method takes care to resolve type variables as
+   * described below.
+   * <p>
+   * If field type is a class return it as it is.
+   * <p>
+   * If field is a type variable, e.g. <code>data</code> field from sample code, delegates
+   * {@link #resolveTypeVariable(Type, Type)} and return the actual type argument used on class instantiation.
+   * 
+   * <pre>
+   * class Container&lt;T&gt;
+   * {
+   *   T data;
+   * }
+   * </pre>
+   * <p>
+   * If field is a parameterized type, be it object, collection or map, ensure all type arguments are resolved using the
+   * same {@link #resolveTypeVariable(Type, Type)} and return a new {@link GType} instance with field raw type and
+   * resolved type arguments.
+   * 
+   * <pre>
+   * class Container&lt;T&gt;
+   * {
+   *   Map<String, T> data;
+   * }
+   * 
+   * Container&lt;Integer&gt; container = new Container&lt;&gt;();
+   * </pre>
+   * 
+   * For above example this method return <code>new GType(Map.class, String.class, Integer.class)</code>. New operator
+   * for example is just to demo type argument; on this implementation instances are created reflectively.
+   * <p>
+   * Implemented solution for parameterized types allows for not limited nesting hierarchy. It is legal to have a grand
+   * father, with father and child, all parameterized. At every level this method return <code>GType</code> with type
+   * argument initialized from field declaring class type parameters.
    * 
    * @return field type or null.
    */
@@ -140,36 +145,28 @@ class ObjectValue extends Value
       return null;
     }
 
-    Type type = field.getGenericType();
-    if(!(type instanceof TypeVariable)) {
-      return type;
+    Type fieldType = field.getGenericType();
+    if(fieldType instanceof Class) {
+      return fieldType;
     }
 
-    // here we have a type variable and need to find out the actual type argument from declaring class
-
-    String fieldTypeVariableName = ((TypeVariable<?>)type).getName();
-
-    if(!(declaringType instanceof ParameterizedType)) {
-      throw new BugError("Type variable field should be declared in a parameterized class. See field |%s|.", field);
-    }
-    ParameterizedType parameterizedDeclaringType = (ParameterizedType)declaringType;
-
-    TypeVariable<?>[] typeParameters = declaringClass.getTypeParameters();
-    Type[] typeArguments = parameterizedDeclaringType.getActualTypeArguments();
-    if(typeParameters.length != typeArguments.length) {
-      throw new BugError("Inconsistent generic class |%s|. Type parameters count does not match type arguments.", declaringType);
+    if(fieldType instanceof TypeVariable) {
+      // here we have a type variable and need to find out the actual type argument from declaring class
+      return resolveTypeVariable(declaringType, fieldType);
     }
 
-    Type fieldType = null;
-    for(int i = 0; i < typeParameters.length; ++i) {
-      if(typeParameters[i].getName().equals(fieldTypeVariableName)) {
-        fieldType = typeArguments[i];
+    if(fieldType instanceof ParameterizedType) {
+      Type[] fieldTypeArguments = ((ParameterizedType)fieldType).getActualTypeArguments();
+      for(int i = 0; i < fieldTypeArguments.length; ++i) {
+        if(fieldTypeArguments[i] instanceof Class) {
+          continue;
+        }
+        fieldTypeArguments[i] = resolveTypeVariable(declaringType, fieldTypeArguments[i]);
       }
+      return new GType(((ParameterizedType)fieldType).getRawType(), fieldTypeArguments);
     }
-    if(fieldType == null) {
-      throw new BugError("Inconsistent generic class |%s|. Missing Type variable |%s|.", declaringType, fieldTypeVariableName);
-    }
-    return fieldType;
+
+    throw new BugError("Unsupported type |%s|.", fieldType);
   }
 
   /**
@@ -184,35 +181,45 @@ class ObjectValue extends Value
   }
 
   /**
-   * Set value for the field identified by field name stored by a previous call to {@link #setFieldName(String)}. If
-   * named field is missing warn to log and just return.
+   * Set value for the field identified by {@link #fieldName} stored by a previous call to
+   * {@link #setFieldName(String)}. If named field is missing log to debug and abort this setter.
    * <p>
-   * This setter uses {@link Classes#getFieldEx(Class, String)} to access named class field and benefit from searching
-   * on superclass too.
+   * This setter uses {@link Classes#getFieldEx(Class, String)} to access declaring class field and benefit from
+   * searching on superclass hierarchy too.
    * 
    * @param value field value, null accepted.
    */
   public void setValue(Object value)
   {
+    if(fieldName == null) {
+      throw new BugError("Field name is not initialized. Please call #setFieldName(String) before invoking this method.");
+    }
+
     try {
-      Field field = Classes.getFieldEx(declaringClass, (String)fieldName);
-      if(value == null && field.getType().isPrimitive()) {
+      Field field = Classes.getFieldEx(declaringClass, fieldName);
+
+      Type fieldType = field.getGenericType();
+      if(fieldType instanceof TypeVariable) {
+        fieldType = resolveTypeVariable(declaringType, fieldType);
+      }
+      Class<?> fieldClass = Classes.forType(fieldType);
+
+      if(value == null && fieldClass.isPrimitive()) {
         log.warn("Attempt to assing null value to primitive field |%s#%s|. Ignore it.", instance.getClass(), field.getName());
         return;
       }
-      field.setAccessible(true);
       if(value == null) {
         field.set(instance, null);
       }
       else if(value instanceof String) {
-        field.set(instance, converter.asObject((String)value, field.getType()));
+        field.set(instance, converter.asObject((String)value, fieldClass));
       }
       else {
         field.set(instance, value);
       }
     }
     catch(NoSuchFieldException e) {
-      // log.warn("Missing field |%s| from class |%s|. Ignore JSON value.", fieldName, clazz);
+      log.debug("Missing field |%s| from class |%s|. Ignore JSON value.", fieldName, declaringClass);
     }
     catch(IllegalArgumentException e) {
       log.error("Illegal argument |%s| while trying to set field |%s| from class |%s|.", value.getClass(), fieldName, declaringType);
@@ -220,5 +227,69 @@ class ObjectValue extends Value
     catch(IllegalAccessException e) {
       throw new BugError(e);
     }
+  }
+
+  // ----------------------------------------------------------------------------------------------
+
+  /**
+   * Return actual type argument from declaring class, related to requested type variable. Type variable is mapped to
+   * actual type argument by name. In sample below both type parameter and type variable has the same name,
+   * <code>T</code>. For the same example this method will return <code>Integer.class</code>.
+   * <p>
+   * A type variable is a field that has a generic type. In sample we have a class with a type parameter named
+   * <code>T</code>. Field <code>data</code> is a type variable since it is not defined when define the class.
+   * 
+   * <pre>
+   * class Container&lt;T&gt;
+   * {
+   *   T data;
+   * }
+   * </pre>
+   * 
+   * Type variable will be resolved when create concrete class from provided type argument. In out case type argument is
+   * <code>Integer</code>. After instantiation <code>data</code> field will have type <code>Integer</code>.
+   * 
+   * <pre>
+   * Container&lt;Integer&gt; container = new Container&lt;&gt;();
+   * assert container.data instanceof Integer;
+   * </pre>
+   * 
+   * @param declaringType parameterized type of the class declaring given type variable,
+   * @param typeVariable type variable, child of declaring class.
+   * @return concrete type, class or parameterized type.
+   */
+  private static Type resolveTypeVariable(Type declaringType, Type typeVariable)
+  {
+    if(!(typeVariable instanceof TypeVariable)) {
+      throw new BugError("Argument <typeVariable> should be of |%s| type.", TypeVariable.class);
+    }
+    if(!(declaringType instanceof ParameterizedType)) {
+      throw new BugError("Type variable |%s| should be declared in a parameterized class |%s|.", typeVariable, declaringType);
+    }
+
+    ParameterizedType parameterizedDeclaringType = (ParameterizedType)declaringType;
+    String typeVariableName = typeVariable.getTypeName();
+
+    Class<?> declaringClass = Classes.forType(declaringType);
+    TypeVariable<?>[] typeParameters = declaringClass.getTypeParameters();
+
+    Type[] typeArguments = parameterizedDeclaringType.getActualTypeArguments();
+    if(typeParameters.length != typeArguments.length) {
+      throw new BugError("Inconsistent generic class |%s|. Type parameters count does not match type arguments.", declaringType);
+    }
+
+    // next logic assume type parameters and type arguments have the same length and order
+    // length is tested above but I do not found yet formal guarantees; anyway unit tests are passing
+
+    Type fieldType = null;
+    for(int i = 0; i < typeParameters.length; ++i) {
+      if(typeParameters[i].getName().equals(typeVariableName)) {
+        fieldType = typeArguments[i];
+      }
+    }
+    if(fieldType == null) {
+      throw new BugError("Inconsistent generic class |%s|. Missing type variable |%s|.", declaringType, typeVariableName);
+    }
+    return fieldType;
   }
 }
