@@ -1,5 +1,11 @@
 package js.json.impl.unit;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -25,9 +31,9 @@ public class FacadeUnitTest extends TestCase
   {
     StringReader reader = new StringReader("{name:\"index.htm\",state:\"ACTIVE\"}");
     Page page = json.parse(reader, Page.class);
-    assertNotNull(page);
-    assertEquals("index.htm", page.name);
-    assertEquals(State.ACTIVE, page.state);
+    assertThat(page, notNullValue());
+    assertThat("index.htm", equalTo(page.name));
+    assertThat(State.ACTIVE, equalTo(page.state));
   }
 
   public void testParseHomogeneousArray() throws IOException
@@ -36,12 +42,12 @@ public class FacadeUnitTest extends TestCase
     StringReader reader = new StringReader(jsonArray);
     Page[] pages = json.parse(reader, Page[].class);
 
-    assertNotNull(pages);
-    assertEquals(2, pages.length);
-    assertEquals("index.htm", pages[0].name);
-    assertEquals(State.ACTIVE, pages[0].state);
-    assertEquals("verboten.htm", pages[1].name);
-    assertEquals(State.BANNED, pages[1].state);
+    assertThat(pages, notNullValue());
+    assertThat(pages.length, equalTo(2));
+    assertThat(pages[0].name, equalTo("index.htm"));
+    assertThat(pages[0].state, equalTo(State.ACTIVE));
+    assertThat(pages[1].name, equalTo("verboten.htm"));
+    assertThat(pages[1].state, equalTo(State.BANNED));
   }
 
   public void testParseMixedObjects() throws IOException
@@ -52,17 +58,17 @@ public class FacadeUnitTest extends TestCase
         double.class, Page.class, String.class, boolean.class
     });
 
-    assertNotNull(parameters);
-    assertEquals(4, parameters.length);
+    assertThat(parameters, notNullValue());
+    assertThat(parameters.length, equalTo(4));
 
     assertTrue(parameters[0] instanceof Double);
     assertTrue(parameters[1] instanceof Page);
     assertTrue(parameters[3] instanceof Boolean);
 
-    assertEquals(123.45, parameters[0]);
-    assertEquals("index.htm", ((Page)parameters[1]).name);
-    assertEquals(State.ACTIVE, ((Page)parameters[1]).state);
-    assertNull(parameters[2]);
+    assertThat(parameters[0], equalTo(123.45));
+    assertThat(((Page)parameters[1]).name, equalTo("index.htm"));
+    assertThat(((Page)parameters[1]).state, equalTo(State.ACTIVE));
+    assertThat(parameters[2], nullValue());
     assertFalse((Boolean)parameters[3]);
   }
 
@@ -73,7 +79,7 @@ public class FacadeUnitTest extends TestCase
     page.state = State.ACTIVE;
     StringWriter writer = new StringWriter();
     json.stringify(writer, page);
-    assertEquals("{\"name\":\"index.htm\",\"state\":\"ACTIVE\"}", writer.toString());
+    assertThat(writer.toString(), equalTo("{\"name\":\"index.htm\",\"state\":\"ACTIVE\"}"));
   }
 
   public void testParseObjectFromString()
@@ -81,9 +87,9 @@ public class FacadeUnitTest extends TestCase
     final String jsonObject = "{\"name\":\"index.htm\",\"state\":\"ACTIVE\"}";
     Page page = json.parse(jsonObject, Page.class);
 
-    assertNotNull(page);
-    assertEquals("index.htm", page.name);
-    assertEquals(State.ACTIVE, page.state);
+    assertThat(page, notNullValue());
+    assertThat(page.name, equalTo("index.htm"));
+    assertThat(page.state, equalTo(State.ACTIVE));
   }
 
   public void testParsePersonListFromString()
@@ -91,12 +97,13 @@ public class FacadeUnitTest extends TestCase
     final String jsonArray = "[{\"name\":\"index.htm\",\"state\":\"ACTIVE\"}, {\"name\":\"verboten.htm\",\"state\":\"BANNED\"}]";
     List<Page> pages = json.parse(jsonArray, new GType(List.class, Page.class));
 
-    assertNotNull(pages);
-    assertEquals(2, pages.size());
-    assertEquals("index.htm", pages.get(0).name);
-    assertEquals(State.ACTIVE, pages.get(0).state);
-    assertEquals("verboten.htm", pages.get(1).name);
-    assertEquals(State.BANNED, pages.get(1).state);
+    assertThat(pages, notNullValue());
+    assertThat(pages, hasSize(2));
+
+    assertThat(pages.get(0).name, equalTo("index.htm"));
+    assertThat(pages.get(0).state, equalTo(State.ACTIVE));
+    assertThat(pages.get(1).name, equalTo("verboten.htm"));
+    assertThat(pages.get(1).state, equalTo(State.BANNED));
   }
 
   private static enum State

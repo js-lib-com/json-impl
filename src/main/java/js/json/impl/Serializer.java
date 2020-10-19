@@ -22,7 +22,7 @@ import js.util.Types;
  * Serialize primitive values, enumerations, objects, arrays, collections and maps to JSON string representation. This
  * class is invoked internally by {@link JsonImpl} facade and is not intended to be reused; create a new serializer
  * instance for every value to stringify. Once instance created invoke {@link #serialize(Writer, Object)} with external
- * created characters writer instance. After serialization completes writer is flushed by left opened.
+ * created characters writer instance. After serialization completes writer is flushed but left opened.
  * <p>
  * This class handle serialization in a best effort manner. If for some reason a field cannot be processed it is
  * replaced by null, but takes care to record failing condition to error log. Currently there are two conditions that
@@ -32,29 +32,15 @@ import js.util.Types;
  * <li>circular dependency discovered, see {@link #circularDependenciesStack}.
  * </ol>
  * <p>
- * Serializer supports an extension used merely by this library: add class name before actual serialized value.
- * Considering below <code>js.test.Page</code> class:
- * 
- * <pre>
- * 	  class js.test.Page
- * 	  {
- * 	    String name;
- * 	    State state;
- * 	  }
- * </pre>
- * <p>
- * it is serialized as follow: <code>{"class":"js.test.Page","name":"index.htm","state":"ACTIVE"}</code>. This format is
- * recognized by {@link Parser#parse(java.io.Reader)}.
- * <p>
  * For enumeration serialization this class uses enumeration constant upper case name, as string. Anyway, if enumeration
  * implements {@link OrdinalEnum} this serializer uses enumeration ordinal as numeric value.
  * 
  * @author Iulian Rotaru
  */
-public final class Serializer
+public class Serializer
 {
   /** Class logger. */
-  public static final Log log = LogFactory.getLog(Serializer.class);
+  protected static final Log log = LogFactory.getLog(Serializer.class);
 
   /** JSON keyword for null values. */
   private static final String KEYWORD_NULL = "null";
@@ -103,7 +89,7 @@ public final class Serializer
    * @param value primitive or aggregated value.
    * @throws IOException if IO write operation fails.
    */
-  private void serialize(Object value) throws IOException
+  protected void serialize(Object value) throws IOException
   {
     if(value == null) {
       write(KEYWORD_NULL);
@@ -161,7 +147,7 @@ public final class Serializer
    * @param value
    * @throws IOException
    */
-  private void serializeArray(Object value) throws IOException
+  protected void serializeArray(Object value) throws IOException
   {
     write('[');
     int index = 0;
@@ -184,7 +170,7 @@ public final class Serializer
    * @param value value map.
    * @throws IOException if IO write operation fails.
    */
-  private void serializeMap(Object value) throws IOException
+  protected void serializeMap(Object value) throws IOException
   {
     assert value != null;
     assert value instanceof Map;
@@ -208,10 +194,9 @@ public final class Serializer
   }
 
   /**
-   * Serialize opening curly brace, all fields separated by comma and closing curly brace. All fields are serialized, in
-   * no particular order, except static and transient. If {@link #includeClass} flag is true fields serialization is
-   * preceded by value object class name. Also this method process superclass hierarchy as long as superclass is part of
-   * the same package as given value object.
+   * Serialize opening curly brace, all fields separated by comma and closing curly brace. All fields are serialized,
+   * except static and transient, in no particular order. Also this method process superclass hierarchy as long as
+   * superclass is part of the same package as given value object.
    * <p>
    * Note that this method hides a recursive call to {@link #serialize(Object)} via
    * {@link #serializeField(Object, Field)}.
@@ -219,7 +204,7 @@ public final class Serializer
    * @param value value object to serialize.
    * @throws IOException if IO write operation fails.
    */
-  private void serializeObject(Object value) throws IOException
+  protected void serializeObject(Object value) throws IOException
   {
     assert value != null;
 
@@ -271,7 +256,7 @@ public final class Serializer
    * @param field field reflective descriptor.
    * @throws IOException if IO write operation fails.
    */
-  private void serializeField(Object value, Field field) throws IOException
+  protected void serializeField(Object value, Field field) throws IOException
   {
     field.setAccessible(true);
     writeString(field.getName());
@@ -286,7 +271,7 @@ public final class Serializer
    * @param field field reflective descriptor.
    * @return instance field value.
    */
-  private static Object getFieldValue(Object instance, Field field)
+  protected static Object getFieldValue(Object instance, Field field)
   {
     try {
       return field.get(instance);
@@ -317,7 +302,7 @@ public final class Serializer
    * @param string string to escape and write.
    * @throws IOException if IO write operation fails.
    */
-  private void writeString(String string) throws IOException
+  protected void writeString(String string) throws IOException
   {
     write('"');
 
@@ -376,7 +361,7 @@ public final class Serializer
    * @param s string to write.
    * @throws IOException if IO write operation fails.
    */
-  private void write(String s) throws IOException
+  protected void write(String s) throws IOException
   {
     writer.write(s);
   }
@@ -388,7 +373,7 @@ public final class Serializer
    * @param c character to write.
    * @throws IOException if IO write operation fails.
    */
-  private void write(char c) throws IOException
+  protected void write(char c) throws IOException
   {
     writer.write(c);
   }
@@ -398,7 +383,7 @@ public final class Serializer
    * 
    * @param value current value object on which circular dependency was discovered.
    */
-  private void dumpCircularDependenciesStack(Object value)
+  protected void dumpCircularDependenciesStack(Object value)
   {
     ListIterator<Object> it = circularDependenciesStack.listIterator(circularDependenciesStack.size());
     StringBuilder dump = new StringBuilder();

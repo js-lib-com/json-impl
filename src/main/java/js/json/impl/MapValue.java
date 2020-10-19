@@ -15,7 +15,7 @@ import js.util.Classes;
  * 
  * @author Iulian Rotaru
  */
-final class MapValue extends ObjectValue {
+public final class MapValue extends ObjectValue {
 	/** Map key type initialized from constructor map type, first actual type argument. */
 	private final Class<?> keyType;
 
@@ -34,7 +34,7 @@ final class MapValue extends ObjectValue {
 	 * @throws JsonParserException if <code>type</code> is not parameterized, first type argument is not string or second is
 	 *             missing.
 	 */
-	MapValue(Converter converter, Type type) {
+	public MapValue(Converter converter, Type type) {
 		super(converter);
 		if (!(type instanceof ParameterizedType)) {
 			throw new JsonParserException("This JSON parser mandates generic maps usage but got |%s|.", type);

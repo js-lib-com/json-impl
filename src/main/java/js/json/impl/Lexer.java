@@ -126,7 +126,7 @@ public final class Lexer {
 	 * 
 	 * @param token token to put back.
 	 */
-	void unread(Token token) {
+	public void unread(Token token) {
 		unreadTokens.push(token);
 	}
 

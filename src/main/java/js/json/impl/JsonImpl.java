@@ -10,12 +10,11 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 
 import js.json.Json;
-import js.util.Files;
 
 /**
- * JSON serialization / deserialization facade. This facade just delegates {@link Serializer} and {@link Parser}
- * functionality. It supplies methods to {@link #stringify(Writer, Object)} and {@link #parse(Reader, Type)} values to
- * and from JSON character streams. There are also convenient methods for values to JSON strings conversion, see
+ * JSON serialization / deserialization facade. This facade just delegates {@link Serializer} and {@link Parser}. It
+ * supplies methods to {@link #stringify(Writer, Object)} and {@link #parse(Reader, Type)} values to and from JSON
+ * character streams. There are also convenient methods for values to JSON strings conversion, see
  * {@link #stringify(Object)} and {@link #parse(String, Type)}.
  * <p>
  * Parsing of not homogeneous arrays is supported but caller should supplies the type of every array item, see
@@ -30,9 +29,9 @@ public final class JsonImpl implements Json
 
   /**
    * Serialize value to JSON character stream. Both primitive and aggregated values are allowed. If value is not
-   * primitive all fields are scanned reflectively, less static and transient. If a field is aggregated on its turn
-   * traverse its fields too. This allows for not restricted fields graph. Note that there is no guarantee regarding
-   * fields order inside parent object.
+   * primitive all fields are scanned reflectively, less static and transient. If a field is aggregated on its turn,
+   * traverse its fields recursively. This allows for not restricted objects graph. Note that there is no guarantee
+   * regarding fields order inside parent object.
    * <p>
    * After serialization completes <code>writer</code> is flushed but left unclosed.
    * 
@@ -112,19 +111,15 @@ public final class JsonImpl implements Json
   @Override
   public String stringify(Object value)
   {
-    StringWriter writer = new StringWriter();
-    try {
+    try (StringWriter writer = new StringWriter()) {
       Serializer serializer = new Serializer();
       serializer.serialize(writer, value);
+      return writer.toString();
     }
     catch(IOException e) {
       // there is no reason to have IO write operation fail on string beside hardware or system resources shortage
       throw new RuntimeException(e);
     }
-    finally {
-      Files.close(writer);
-    }
-    return writer.toString();
   }
 
   /**

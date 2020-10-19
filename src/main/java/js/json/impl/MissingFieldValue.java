@@ -11,7 +11,7 @@ import js.converter.Converter;
  * @author Iulian Rotaru
  */
 public class MissingFieldValue extends ObjectValue {
-	protected MissingFieldValue(Converter converter) {
+	public MissingFieldValue(Converter converter) {
 		super(converter);
 	}
 
