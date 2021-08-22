@@ -673,6 +673,15 @@ public class ParserUnitTest
     String json = "{\"fake-field-name\":\"John Doe\",\"age\":50}";
     exercise(json, Person.class);
   }
+
+  @Test
+  public void underscoreField() throws Throwable {
+    String json = "{\"first_name\":\"John Doe\"}";
+    Underscore response = exercise(json, Underscore.class);
+    assertNotNull(response);
+    assertNotNull(response.first_name);
+    assertEquals("John Doe", response.first_name);
+  }
   
   // ----------------------------------------------------
 
@@ -806,5 +815,9 @@ public class ParserUnitTest
   private static class Library<T>
   {
     Corpus<T> corpus;
+  }
+  
+  private static class Underscore {
+    String first_name;
   }
 }

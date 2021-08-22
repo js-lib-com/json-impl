@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 
 import js.converter.Converter;
 import js.converter.ConverterRegistry;
+import js.json.JsonLifeCycle;
 import js.lang.OrdinalEnum;
 import js.log.Log;
 import js.log.LogFactory;
@@ -332,7 +333,11 @@ public class Parser
     }
 
     state = State.NONE;
-    return (T)value.instance();
+    T t = (T)value.instance();
+    if(t instanceof JsonLifeCycle) {
+      ((JsonLifeCycle)t).postParse();
+    }
+    return t;
   }
 
   /**

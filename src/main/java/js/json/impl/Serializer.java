@@ -11,6 +11,7 @@ import java.util.Stack;
 
 import js.converter.Converter;
 import js.converter.ConverterRegistry;
+import js.json.JsonLifeCycle;
 import js.lang.BugError;
 import js.lang.OrdinalEnum;
 import js.log.Log;
@@ -102,6 +103,10 @@ public class Serializer
       return;
     }
     circularDependenciesStack.push(value);
+
+    if(value instanceof JsonLifeCycle) {
+      ((JsonLifeCycle)value).preStringify();
+    }
 
     Converter converter = ConverterRegistry.getConverter();
     try {
