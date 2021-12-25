@@ -1,6 +1,8 @@
 package js.json.impl;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -260,8 +262,16 @@ public class ObjectValue implements Value
    */
   private static Type resolveTypeVariable(Type declaringType, Type typeVariable)
   {
+    if(typeVariable instanceof GenericArrayType) {
+      typeVariable = ((GenericArrayType)typeVariable).getGenericComponentType();
+      // at this point typeVariable is of type TypeVariableImpl; anyway, on Android JVM it is a concrete class
+      if(typeVariable instanceof Class) {
+        // respond with concrete array type
+        return Array.newInstance((Class<?>)typeVariable, 0).getClass();
+      }
+    }
     if(!(typeVariable instanceof TypeVariable)) {
-      throw new BugError("Argument <typeVariable> should be of |%s| type.", TypeVariable.class);
+      throw new BugError("Argument <typeVariable> should be of |%s| type but is |%s|.", TypeVariable.class, typeVariable.getTypeName());
     }
     if(!(declaringType instanceof ParameterizedType)) {
       throw new BugError("Type variable |%s| should be declared in a parameterized class |%s|.", typeVariable, declaringType);

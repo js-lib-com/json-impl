@@ -557,6 +557,28 @@ public class ParserUnitTest
     assertEquals("specialist", map.get(2.0));
   }
 
+  @Test
+  public void map_StringsArray() throws Throwable
+  {
+    String json = "{\"map\":{\"John Doe\":[\"worker\",\"specialist\"]}}";
+    StringsArray strings = exercise(json, StringsArray.class);
+    assertNotNull(strings);
+    assertTrue(strings instanceof StringsArray);
+    assertEquals("worker", strings.map.get("John Doe")[0]);
+    assertEquals("specialist", strings.map.get("John Doe")[1]);
+  }
+
+  @Test
+  public void map_GenericArray() throws Throwable
+  {
+    String json = "{\"map\":{\"John Doe\":[\"worker\",\"specialist\"]}}";
+    GenericArray<String> strings = exercise(json, new GType(GenericArray.class, String[].class));
+    assertNotNull(strings);
+    assertTrue(strings instanceof GenericArray);
+    assertEquals("worker", strings.map.get("John Doe")[0]);
+    assertEquals("specialist", strings.map.get("John Doe")[1]);
+  }
+
   @SuppressWarnings("unchecked")
   @Test
   public void argumentsList() throws Throwable
@@ -669,20 +691,22 @@ public class ParserUnitTest
   }
 
   @Test
-  public void missingField() throws Throwable {
+  public void missingField() throws Throwable
+  {
     String json = "{\"fake-field-name\":\"John Doe\",\"age\":50}";
     exercise(json, Person.class);
   }
 
   @Test
-  public void underscoreField() throws Throwable {
+  public void underscoreField() throws Throwable
+  {
     String json = "{\"first_name\":\"John Doe\"}";
     Underscore response = exercise(json, Underscore.class);
     assertNotNull(response);
     assertNotNull(response.first_name);
     assertEquals("John Doe", response.first_name);
   }
-  
+
   // ----------------------------------------------------
 
   private static <T> T exercise(String json, Class<T> clazz) throws Throwable
@@ -816,8 +840,19 @@ public class ParserUnitTest
   {
     Corpus<T> corpus;
   }
-  
-  private static class Underscore {
+
+  private static class Underscore
+  {
     String first_name;
+  }
+
+  private static class StringsArray
+  {
+    Map<String, String[]> map;
+  }
+
+  private static class GenericArray<T>
+  {
+    Map<String, T[]> map;
   }
 }
