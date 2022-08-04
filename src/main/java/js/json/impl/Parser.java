@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
 
+import com.jslib.api.log.Log;
+import com.jslib.api.log.LogFactory;
+
 import js.converter.Converter;
 import js.converter.ConverterRegistry;
 import js.json.JsonLifeCycle;
 import js.lang.OrdinalEnum;
-import js.log.Log;
-import js.log.LogFactory;
 import js.util.Types;
 
 /**

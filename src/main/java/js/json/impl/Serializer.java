@@ -9,13 +9,14 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
 
+import com.jslib.api.log.Log;
+import com.jslib.api.log.LogFactory;
+
 import js.converter.Converter;
 import js.converter.ConverterRegistry;
 import js.json.JsonLifeCycle;
 import js.lang.BugError;
 import js.lang.OrdinalEnum;
-import js.log.Log;
-import js.log.LogFactory;
 import js.util.Strings;
 import js.util.Types;
 

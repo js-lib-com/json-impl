@@ -7,11 +7,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
+import com.jslib.api.log.Log;
+import com.jslib.api.log.LogFactory;
+
 import js.converter.Converter;
 import js.lang.BugError;
 import js.lang.GType;
-import js.log.Log;
-import js.log.LogFactory;
 import js.util.Classes;
 import js.util.Strings;
 
