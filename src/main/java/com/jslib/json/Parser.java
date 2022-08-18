@@ -86,15 +86,12 @@ public class Parser
       return _parse(type);
     }
     catch(IOException e) {
-      log.debug(e);
       throw e;
     }
     catch(JsonParserException e) {
-      log.debug(e);
       throw e;
     }
     catch(Throwable t) {
-      log.debug(t);
       throw new JsonParserException(t);
     }
   }
@@ -140,15 +137,12 @@ public class Parser
       return instances;
     }
     catch(IOException e) {
-      log.debug(e);
       throw e;
     }
     catch(JsonParserException e) {
-      log.debug(e);
       throw e;
     }
     catch(Throwable t) {
-      log.debug(t);
       throw new JsonParserException(t);
     }
   }

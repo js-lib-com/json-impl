@@ -292,7 +292,7 @@ public class Serializer
       // will throw HibernateException which is a RuntimeException
       // in order to avoid Hibernate library dependency on this package uses RuntimeException to catch this condition
       // log this condition but take best effort approach: do not throw exception, instead leave value to null
-      log.error("Error reading field |%s| value. Set it to null. Error cause: %s", field, e);
+      log.error("Error reading field |{java_field}| value. Set it to null. Error cause: {exception}", field, e);
     }
     return null;
   }
@@ -395,6 +395,6 @@ public class Serializer
     while(it.hasPrevious()) {
       dump.append(Strings.concat("\t- ", it.previous().getClass().getName(), "\r\n"));
     }
-    log.error("Circular dependecies on value object |%s|. Set it to null. Stack dump:\r\n%s", value.getClass().getName(), dump.toString());
+    log.error("Circular dependecies on value object |{java_type}|. Set it to null. Stack dump:\r\n{dump}", value.getClass().getName(), dump.toString());
   }
 }

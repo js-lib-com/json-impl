@@ -207,7 +207,7 @@ public class ObjectValue implements Value
       Class<?> fieldClass = Classes.forType(fieldType);
 
       if(value == null && fieldClass.isPrimitive()) {
-        log.warn("Attempt to assing null value to primitive field |%s#%s|. Ignore it.", instance.getClass(), field.getName());
+        log.warn("Attempt to assing null value to primitive field |{java_type}#{java_field}|. Ignore it.", instance.getClass(), field.getName());
         return;
       }
       if(value == null) {
@@ -221,10 +221,10 @@ public class ObjectValue implements Value
       }
     }
     catch(NoSuchFieldException e) {
-      log.debug("Missing field |%s| from class |%s|. Ignore JSON value.", fieldName, declaringClass);
+      log.debug("Missing field |{java_field}| from class |{java_type}|. Ignore JSON value.", fieldName, declaringClass);
     }
     catch(IllegalArgumentException e) {
-      log.error("Illegal argument |%s| while trying to set field |%s| from class |%s|.", value.getClass(), fieldName, declaringType);
+      log.error("Illegal argument |{java_type}| while trying to set field |{java_field}| from class |{java_type}|.", value.getClass(), fieldName, declaringType);
     }
     catch(IllegalAccessException e) {
       throw new BugError(e);
