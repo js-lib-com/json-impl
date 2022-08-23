@@ -579,6 +579,22 @@ public class ParserUnitTest
     assertEquals("specialist", strings.map.get("John Doe")[1]);
   }
 
+  /**
+   * Be it a map of objects. Even JSON contains numeric and boolean values they are stored as strings. Remember that
+   * objects are converted to strings, so map of objects behaves like map of strings.
+   */
+  @Test
+  public void map_Objects() throws Throwable
+  {
+    String json = "{\"name\":\"Tom Joad\",\"age\":58,\"married\":false}";
+    Map<String, Object> map = exercise(json, new GType(Map.class, String.class, Object.class));
+    assertNotNull(map);
+    assertTrue(map instanceof Map);
+    assertTrue(map.get("name") instanceof String);
+    assertTrue(map.get("age") instanceof String);
+    assertTrue(map.get("married") instanceof String);
+  }
+
   @SuppressWarnings("unchecked")
   @Test
   public void argumentsList() throws Throwable
